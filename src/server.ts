@@ -13,7 +13,7 @@ import usersRouter from "./api/user/index";
 import accommodationsRouter from "./api/accommodation/index";
 
 const server = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3003;
 
 server.use(
   cors()

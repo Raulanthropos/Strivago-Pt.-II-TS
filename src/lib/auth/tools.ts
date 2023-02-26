@@ -10,7 +10,7 @@ interface TokenPayload {
   role: "Host" | "Guest";
 }
 
-const createAccessToken = (payload: TokenPayload): Promise<string> =>
+export const createAccessToken = (payload: TokenPayload): Promise<string> =>
   new Promise((resolve, reject) =>
     jwt.sign(
       payload,
