@@ -1,17 +1,16 @@
 import { Model, Document } from "mongoose";
 
-export interface User {
+interface User {
   email: string;
   password: string;
-  role: "Host" | "Guest";
-  refreshToken: string;
+  role: "guest" | "host";
 }
 
 export interface UserDocument extends User, Document {}
 
-export interface UsersModel extends Model<UserDocument> {
+export interface UserModel extends Model<UserDocument> {
   checkCredentials(
     email: string,
-    plainPassword: string
+    password: string
   ): Promise<UserDocument | null>;
 }

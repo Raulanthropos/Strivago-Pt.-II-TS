@@ -1,11 +1,11 @@
 import supertest from "supertest";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import server from "../server";
+import { server } from "../server";
 // import { expressServer } from "../server";
-import UsersModel from "../api/user/model";
+import UsersModel from "../apis/users/model";
 import { response } from "express";
-import AccomodationsModel from "../api/accommodation/model";
+import AccommodationsModel from "../apis/accommodations/model";
 
 dotenv.config(); // This command forces .env vars to be loaded into process.env. This is the way to do it whenever you can't use -r dotenv/config
 
@@ -45,18 +45,18 @@ const notValidAccommodation = {
 let validAccommodationId: string;
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGO_DB_URL!);
+  await mongoose.connect(process.env.MONGO_URL_TEST!);
   const user = new UsersModel(validUser);
   await user.save();
   validAccommodation.host = user._id;
-  const accommodation = new AccomodationsModel(validAccommodation);
+  const accommodation = new AccommodationsModel(validAccommodation);
   await accommodation.save();
   validAccommodationId = accommodation._id;
 });
 
 afterAll(async () => {
   await UsersModel.deleteMany();
-  await AccomodationsModel.deleteMany();
+  await AccommodationsModel.deleteMany();
   await mongoose.connection.close();
 });
 
@@ -103,26 +103,26 @@ describe("Testing USER APIs", () => {
 describe("Testing Accommodations APIs", () => {
   it("Should return all accommodations if you use valid credentials", async () => {
     const response = await client
-      .get("/accomodations")
+      .get("/accommodations")
       .set("Authorization", `Bearer ${accessToken}`);
     // console.log(response);
     expect(response.status).toBe(200);
   });
 
-  it("Should test that GET /accomodations returns 401 if you don't provide a valid accessToken", async () => {
-    await client.get("/accomodations").expect(401);
+  it("Should test that GET /accommodations returns 401 if you don't provide a valid accessToken", async () => {
+    await client.get("/accommodations").expect(401);
   });
 
-  it("Should test that GET /accomodations/:accomodationId with an existing id returns the accommodation that matched the id from params", async () => {
+  it("Should test that GET /accommodations/:accommodationId with an existing id returns the accommodation that matched the id from params", async () => {
     const response = await client
-      .get(`/accomodations/${validAccommodationId.toString()}`)
+      .get(`/accommodations/${validAccommodationId.toString()}`)
       .set("Authorization", `Bearer ${accessToken}`)
       .expect(200);
   });
 
-  it("Should test that GET /:accomodationId with a not valid id to return 404", async () => {
+  it("Should test that GET /:accommodationId with a not valid id to return 404", async () => {
     await client
-      .get("/accomodations/123456789123456789123456")
+      .get("/accommodations/123456789123456789123456")
       .set("Authorization", `Bearer ${accessToken}`)
       .expect(404);
   });

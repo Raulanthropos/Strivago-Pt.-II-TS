@@ -1,42 +1,31 @@
 import express from "express";
-import listEndpoints from "express-list-endpoints";
 import cors from "cors";
+
+import usersRouter from "./apis/users/index";
 import {
   badRequestHandler,
   forbiddenHandler,
-  genericServerErrorHandler,
-  notFoundHandler,
+  genericErrorHAndler,
   unauthorizedHandler,
+  notFoundHandler,
 } from "./errorHandlers";
-import mongoose from "mongoose";
-import usersRouter from "./api/user/index";
-import accommodationsRouter from "./api/accommodation/index";
+import accommodationsRouter from "./apis/accommodations/index";
 
-const server = express();
-const port = process.env.PORT || 3003;
+export const server = express();
 
-server.use(
-  cors()
-);
+//MIDDLEWARES
 
+server.use(cors());
 server.use(express.json());
+
+//ENDPOINTS
 
 server.use("/users", usersRouter);
 server.use("/accommodations", accommodationsRouter);
 
+//ERROR HANDLERS
 server.use(badRequestHandler);
 server.use(unauthorizedHandler);
 server.use(forbiddenHandler);
 server.use(notFoundHandler);
-server.use(genericServerErrorHandler);
-
-if (process.env.MONGO_DB_CONNECTION_STRING) {
-  mongoose.connect(process.env.MONGO_DB_CONNECTION_STRING);
-}
-
-server.listen(port, () => {
-  console.table(listEndpoints(server));
-  console.log("Server is up and running on port " + port);
-});
-
-export default server;
+server.use(genericErrorHAndler);
