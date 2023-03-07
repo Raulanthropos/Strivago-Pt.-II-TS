@@ -14,12 +14,12 @@ dotenv.config(); // This command forces .env vars to be loaded into process.env.
 const client = supertest(server);
 
 const validUser = {
-  email: "user@gmail.com",
+  email: "user@examplemail.com",
   password: "1234",
 };
 
-const notValidUser = {
-  email: "user@gmail.com",
+const invalidUser = {
+  email: "user@examplemail.com",
 };
 
 const validUserNotInDb = {
@@ -31,15 +31,15 @@ const validAccommodation = {
   name: "valid accommodation",
   description: "nice",
   maxGuests: 4,
-  city: "Brasov",
-  host: "3232",
+  city: "Chios",
+  host: "1312",
 };
 
-const notValidAccommodation = {
-  name: "valid accommodation",
+const invalidAccommodation = {
+  name: "invalid accommodation",
   description: "nice",
-  maxGuests: 4,
-  host: "4323",
+  city: "Chios",
+  host: "1312",
 };
 
 let validAccommodationId: string;
@@ -63,17 +63,17 @@ afterAll(async () => {
 let accessToken: string;
 
 describe("Testing USER APIs", () => {
-  it("Should test that POST /users with a not valid user returns a 400", async () => {
-    await client.post("/users").send(notValidUser).expect(400);
+  it("Should test that POST /users with an invalid user returns a 400", async () => {
+    await client.post("/users").send(invalidUser).expect(400);
   });
 
-  it("Should test that POST/users/login with correct credentials will return a token", async () => {
+  it("Should test that POST/users/login with correct credentials will return a JWT token", async () => {
     const response = await client.post("/users/login").send(validUser);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("accessToken");
     accessToken = response.body.accessToken;
   });
-  it("Should test that POST /users/register with existing user will return 400 (email already registered in db)", async () => {
+  it("Should test that POST /users/register with existing user will return 400 (email already exists in db)", async () => {
     const response = await client.post("/users/register").send(validUser);
     expect(response.status).toBe(400);
   });
@@ -87,7 +87,7 @@ describe("Testing USER APIs", () => {
     accessToken = response.body.accessToken;
   });
 
-  it("Should test that GET /users/me returns 401 if you don't provide a valid accessToken", async () => {
+  it("Should test that GET /users/me returns 401 forbidden, if you don't provide a valid accessToken", async () => {
     await client.get("/users/me").expect(401);
   });
 
@@ -120,7 +120,7 @@ describe("Testing Accommodations APIs", () => {
       .expect(200);
   });
 
-  it("Should test that GET /:accommodationId with a not valid id to return 404", async () => {
+  it("Should test that GET /:accommodationId with an invalid id returns 404", async () => {
     await client
       .get("/accommodations/123456789123456789123456")
       .set("Authorization", `Bearer ${accessToken}`)
